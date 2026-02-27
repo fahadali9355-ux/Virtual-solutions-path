@@ -97,14 +97,23 @@ export default function ManageCoursesPage() {
                       <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">{course.category}</span>
                     </td>
                     <td className="p-4 text-right">
-                      <button
-                        onClick={() => handleDelete(course._id)}
-                        disabled={deleting === course._id}
-                        className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors disabled:opacity-50"
-                        title="Delete Course"
-                      >
-                        {deleting === course._id ? <Loader2 size={18} className="animate-spin" /> : <Trash size={18} />}
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/admin/edit-course/${course._id}`}
+                          className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"
+                          title="Edit Course"
+                        >
+                          <Edit size={18} />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(course._id)}
+                          disabled={deleting === course._id}
+                          className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors disabled:opacity-50"
+                          title="Delete Course"
+                        >
+                          {deleting === course._id ? <Loader2 size={18} className="animate-spin" /> : <Trash size={18} />}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
