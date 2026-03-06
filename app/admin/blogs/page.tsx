@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Eye, EyeOff, Star } from "lucide-react";
 
 export default function AdminBlogsPage() {
     const [blogs, setBlogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState<string | null>(null);
+    const [featuring, setFeaturing] = useState<string | null>(null);
 
     const fetchBlogs = async () => {
         setLoading(true);
@@ -42,7 +43,40 @@ export default function AdminBlogsPage() {
         }
     };
 
+    const handleFeatureToggle = async (id: string, currentFeatured: boolean) => {
+        // If trying to feature and already 3 featured, block it
+        if (!currentFeatured) {
+            const featuredCount = blogs.filter((b) => b.featuredOnHome).length;
+            if (featuredCount >= 3) {
+                alert("Maximum 3 featured blogs allowed!\n\nPehle kisi aur blog ko un-feature karo, phir naya feature karo.");
+                return;
+            }
+        }
+        setFeaturing(id);
+        try {
+            const res = await fetch("/api/admin/blogs/feature", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, featuredOnHome: !currentFeatured }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setBlogs(blogs.map((b) =>
+                    b._id === id ? { ...b, featuredOnHome: !currentFeatured } : b
+                ));
+            } else {
+                alert(data.error || "Feature toggle failed.");
+            }
+        } catch {
+            alert("Server error.");
+        } finally {
+            setFeaturing(null);
+        }
+    };
+
     if (loading) return <div className="p-10 flex items-center gap-2"><Loader2 className="animate-spin text-blue-600" /> Loading Blogs...</div>;
+
+    const featuredCount = blogs.filter((b) => b.featuredOnHome).length;
 
     return (
         <div className="space-y-6">
@@ -57,16 +91,26 @@ export default function AdminBlogsPage() {
                 </Link>
             </div>
 
+            {/* Featured Info Banner */}
+            <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl text-sm font-medium">
+                <Star size={16} className="fill-amber-400 text-amber-400 shrink-0" />
+                <span>
+                    <strong>{featuredCount}/3</strong> blogs featured on landing page.
+                    {featuredCount === 3 && <span className="text-amber-700 ml-1">— Kisi ko un-feature karo naya add karne ke liye.</span>}
+                </span>
+            </div>
+
             {/* Table */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto w-full">
-                    <table className="w-full min-w-[700px] text-left border-collapse text-sm">
+                    <table className="w-full min-w-[750px] text-left border-collapse text-sm">
                         <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-200">
                             <tr>
                                 <th className="p-4">Title</th>
                                 <th className="p-4">Category</th>
                                 <th className="p-4">Author</th>
                                 <th className="p-4">Status</th>
+                                <th className="p-4">Featured</th>
                                 <th className="p-4">Date</th>
                                 <th className="p-4 text-right">Actions</th>
                             </tr>
@@ -74,7 +118,7 @@ export default function AdminBlogsPage() {
                         <tbody className="divide-y divide-slate-100">
                             {blogs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="p-10 text-center text-slate-400">
+                                    <td colSpan={7} className="p-10 text-center text-slate-400">
                                         No blogs yet. Click "Write New Blog" to get started!
                                     </td>
                                 </tr>
@@ -100,6 +144,27 @@ export default function AdminBlogsPage() {
                                                     <EyeOff size={12} /> Draft
                                                 </span>
                                             )}
+                                        </td>
+                                        <td className="p-4">
+                                            <button
+                                                onClick={() => handleFeatureToggle(blog._id, blog.featuredOnHome)}
+                                                disabled={featuring === blog._id}
+                                                title={blog.featuredOnHome ? "Landing page se hatao" : "Landing page par dikhaao"}
+                                                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${blog.featuredOnHome
+                                                        ? "bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100"
+                                                        : "bg-slate-50 text-slate-400 border border-slate-200 hover:bg-slate-100 hover:text-amber-500"
+                                                    }`}
+                                            >
+                                                {featuring === blog._id ? (
+                                                    <Loader2 size={14} className="animate-spin" />
+                                                ) : (
+                                                    <Star
+                                                        size={14}
+                                                        className={blog.featuredOnHome ? "fill-amber-400 text-amber-400" : ""}
+                                                    />
+                                                )}
+                                                {blog.featuredOnHome ? "Featured" : "Feature"}
+                                            </button>
                                         </td>
                                         <td className="p-4 text-xs text-slate-400">
                                             {new Date(blog.createdAt).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}

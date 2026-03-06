@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, CheckCircle, ArrowRight, Star, Users, Briefcase, PlayCircle, Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, LayoutDashboard, Loader2, Menu, X } from 'lucide-react';
+import { BookOpen, CheckCircle, ArrowRight, Star, Users, Briefcase, PlayCircle, Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, LayoutDashboard, Loader2, Menu, X, Calendar, Tag } from 'lucide-react';
 import Link from 'next/link';
 
 // --- ANIMATION CONFIG ---
@@ -42,6 +42,7 @@ export default function HomePage() {
   // 👇 STATES
   const [courses, setCourses] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>([]); // 👈 New Category State
+  const [featuredBlogs, setFeaturedBlogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // 1. Check Auth & Fetch Data
@@ -69,6 +70,13 @@ export default function HomePage() {
         const catData = await catRes.json();
         if (catData.categories) {
           setCategories(catData.categories);
+        }
+
+        // 3. Fetch Featured Blogs for Landing Page
+        const blogsRes = await fetch("/api/blogs?featured=true");
+        const blogsData = await blogsRes.json();
+        if (blogsData.blogs) {
+          setFeaturedBlogs(blogsData.blogs);
         }
 
       } catch (error) {
@@ -338,6 +346,92 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      {/* --- FEATURED BLOGS SECTION --- */}
+      {featuredBlogs.length > 0 && (
+        <section className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6"
+            >
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-100 text-blue-700 rounded-full text-xs font-bold tracking-wide mb-4">
+                  <BookOpen size={12} /> FROM OUR BLOG
+                </div>
+                <h2 className="text-3xl font-bold text-[#082F49]">Latest Articles & Insights</h2>
+                <p className="text-slate-500 mt-3 text-lg">Stay updated with our latest tips and guides.</p>
+              </div>
+              <Link href="/blogs" className="hidden md:flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700 transition-colors shrink-0">
+                View All Articles <ArrowRight size={18} />
+              </Link>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredBlogs.map((blog, idx) => (
+                <Link key={blog._id} href={`/blogs/${blog.slug}`}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1, duration: 0.5 }}
+                    className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group cursor-pointer flex flex-col h-full"
+                  >
+                    {/* Cover Image */}
+                    {blog.coverImage ? (
+                      <div className="h-48 overflow-hidden relative">
+                        <img
+                          src={blog.coverImage}
+                          alt={blog.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                      </div>
+                    ) : (
+                      <div className="h-48 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center">
+                        <BookOpen size={48} className="text-blue-300" />
+                      </div>
+                    )}
+
+                    {/* Content */}
+                    <div className="p-6 flex flex-col flex-grow">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 rounded-lg border border-blue-100">
+                          <Tag size={10} /> {blog.category}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#082F49] mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                        {blog.title}
+                      </h3>
+                      <p className="text-slate-500 text-sm leading-relaxed flex-grow line-clamp-2 mb-4">
+                        {blog.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                        <span className="flex items-center gap-1.5 text-xs text-slate-400">
+                          <Calendar size={12} />
+                          {new Date(blog.createdAt).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                        <span className="text-blue-600 font-bold text-xs group-hover:underline decoration-2 underline-offset-4">
+                          Read More →
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile View All link */}
+            <div className="mt-8 flex justify-center md:hidden">
+              <Link href="/blogs" className="flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700 transition-colors">
+                View All Articles <ArrowRight size={18} />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* --- CTA SECTION --- */}
       <section className="py-24 px-6">

@@ -10,6 +10,7 @@ const BlogSchema = new mongoose.Schema({
     content: { type: String, required: true }, // Full article body
     tags: { type: [String], default: [] },
     published: { type: Boolean, default: false },
+    featuredOnHome: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });

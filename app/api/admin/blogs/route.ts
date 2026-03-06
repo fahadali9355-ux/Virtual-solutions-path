@@ -45,12 +45,13 @@ export async function PUT(req: NextRequest) {
     await connectDB();
     try {
         const body = await req.json();
-        const { id, title, author, category, coverImage, excerpt, content, tags, published } = body;
+        const { id, title, author, category, coverImage, excerpt, content, tags, published, featuredOnHome } = body;
 
         const updated = await Blog.findByIdAndUpdate(id, {
             title, author, category, coverImage, excerpt, content,
             tags: tags ? (Array.isArray(tags) ? tags : tags.split(",").map((t: string) => t.trim())) : [],
             published,
+            ...(featuredOnHome !== undefined && { featuredOnHome }),
             updatedAt: new Date(),
         }, { new: true });
 

@@ -1,10 +1,14 @@
 import { connectDB } from "@/lib/db";
 import Blog from "@/models/Blog";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-// GET: Published blogs only (public)
-export async function GET() {
+// GET: Published blogs (public). Pass ?featured=true for landing page featured blogs only.
+export async function GET(req: NextRequest) {
     await connectDB();
-    const blogs = await Blog.find({ published: true }).sort({ createdAt: -1 });
+    const { searchParams } = new URL(req.url);
+    const featured = searchParams.get("featured");
+    const query: any = { published: true };
+    if (featured === "true") query.featuredOnHome = true;
+    const blogs = await Blog.find(query).sort({ createdAt: -1 });
     return NextResponse.json({ blogs });
 }
