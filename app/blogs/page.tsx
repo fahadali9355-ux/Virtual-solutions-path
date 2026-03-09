@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, Calendar, Tag, ArrowRight } from "lucide-react";
+import { Loader2, Calendar, ArrowRight } from "lucide-react";
+import Navbar from "@/components/Navbar";
 
 export default function BlogsPage() {
     const [blogs, setBlogs] = useState<any[]>([]);
@@ -29,8 +30,9 @@ export default function BlogsPage() {
 
     return (
         <div className="min-h-screen bg-slate-50">
+            <Navbar />
             {/* Hero */}
-            <section className="bg-gradient-to-br from-[#082F49] to-[#0C4A6E] text-white py-20 px-4">
+            <section className="bg-gradient-to-br from-[#082F49] to-[#0C4A6E] text-white pt-32 pb-16 px-4">
                 <div className="max-w-5xl mx-auto text-center">
                     <p className="text-blue-300 text-sm font-bold uppercase tracking-widest mb-3">Knowledge Hub</p>
                     <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Blogs & Articles</h1>
@@ -50,8 +52,8 @@ export default function BlogsPage() {
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
                                 className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${activeCategory === cat
-                                        ? "bg-[#082F49] text-white shadow-md"
-                                        : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                                    ? "bg-[#082F49] text-white shadow-md"
+                                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
                                     }`}
                             >
                                 {cat}
@@ -76,7 +78,7 @@ export default function BlogsPage() {
                                 {/* Cover Image */}
                                 <div className="h-48 bg-gradient-to-br from-blue-100 to-slate-200 overflow-hidden">
                                     {blog.coverImage ? (
-                                        <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-lg">
                                             VSP Blog

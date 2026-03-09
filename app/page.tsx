@@ -322,7 +322,7 @@ export default function HomePage() {
                       className="bg-white rounded-2xl overflow-hidden border border-slate-100/80 shadow-sm hover:shadow-2xl hover:shadow-blue-900/5 hover:-translate-y-2 transition-all duration-300 group cursor-pointer flex flex-col h-full"
                     >
                       <div className="h-52 bg-slate-200 relative overflow-hidden">
-                        <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
                         <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-xs font-bold px-3 py-1.5 rounded-lg text-[#082F49] shadow-sm">{course.category}</span>
                       </div>
                       <div className="p-6 flex flex-col flex-grow">
