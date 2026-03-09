@@ -43,7 +43,8 @@ export async function POST(req: Request) {
         name: user.name,
         email: user.email,
         role: user.role || "student", // Database wala role
-        image: user.image || ""
+        image: user.image || "",
+        hasPhone: !!user.phone
       },
     }, { status: 200 });
 

@@ -89,8 +89,19 @@ export default function AllStudentsPage() {
     // Filter Logic
     const filteredStudents = students.filter(s =>
         s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.email.toLowerCase().includes(searchTerm.toLowerCase())
+        s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (s.phone && s.phone.includes(searchTerm))
     );
+
+    // Check if student is new (registered within the last 7 days)
+    const isNewStudent = (dateString?: string) => {
+        if (!dateString) return false;
+        const createdAt = new Date(dateString);
+        const now = new Date();
+        const diffInTime = now.getTime() - createdAt.getTime();
+        const diffInDays = diffInTime / (1000 * 3600 * 24);
+        return diffInDays <= 7;
+    };
 
     if (loading) return <div className="p-10 flex items-center gap-2"><Loader2 className="animate-spin text-blue-600" /> Loading Students...</div>;
 
@@ -104,8 +115,8 @@ export default function AllStudentsPage() {
                     <Search className="absolute left-3 top-3 text-slate-400" size={16} />
                     <input
                         type="text"
-                        placeholder="Search student..."
-                        className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500 w-full md:w-64"
+                        placeholder="Search student by name, email, or phone..."
+                        className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500 w-full md:w-80"
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
@@ -133,8 +144,14 @@ export default function AllStudentsPage() {
                                         return (
                                             <tr key={student._id} className="hover:bg-slate-50">
                                                 <td className="p-4">
-                                                    <div className="font-bold text-slate-800">{student.name}</div>
-                                                    <div className="text-xs text-slate-400">{student.email}</div>
+                                                    <div className="font-bold text-slate-800 flex items-center gap-2">
+                                                        {student.name}
+                                                        {isNewStudent(student.createdAt) && (
+                                                            <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">New</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-xs text-slate-500">{student.email}</div>
+                                                    {student.phone && <div className="text-xs text-blue-600 font-medium font-mono mt-0.5">{student.phone}</div>}
                                                 </td>
                                                 <td className="p-4 italic text-slate-400">Not Enrolled</td>
                                                 <td className="p-4"><span className="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded">Unpaid</span></td>
@@ -156,8 +173,14 @@ export default function AllStudentsPage() {
                                             <tr key={`${student._id}-${idx}`} className="hover:bg-slate-50">
                                                 {/* Student Name (Only on first row logic removed for simplicity, showing on all for clarity) */}
                                                 <td className="p-4 align-top">
-                                                    <div className="font-bold text-slate-800">{student.name}</div>
-                                                    <div className="text-xs text-slate-400">{student.email}</div>
+                                                    <div className="font-bold text-slate-800 flex items-center gap-2">
+                                                        {student.name}
+                                                        {isNewStudent(student.createdAt) && (
+                                                            <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">New</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-xs text-slate-500">{student.email}</div>
+                                                    {student.phone && <div className="text-xs text-blue-600 font-medium font-mono mt-0.5">{student.phone}</div>}
                                                 </td>
 
                                                 {/* Course Name */}

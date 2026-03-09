@@ -30,7 +30,8 @@ export async function POST(req: Request) {
                     name: user.name,
                     email: user.email,
                     role: user.role || "student",
-                    image: user.image || ""
+                    image: user.image || "",
+                    hasPhone: !!user.phone
                 },
             }, { status: 200 });
 
@@ -51,7 +52,8 @@ export async function POST(req: Request) {
                     name: user.name,
                     email: user.email,
                     role: user.role || "student",
-                    image: user.image || ""
+                    image: user.image || "",
+                    hasPhone: false // New user, definitely no phone yet
                 },
             }, { status: 201 });
         }

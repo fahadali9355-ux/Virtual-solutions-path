@@ -11,36 +11,36 @@ export async function GET() {
     await connectDB();
 
     const [users, payments, courses] = await Promise.all([
-      User.find({ role: "student" }).select("-password").lean(),
+      User.find({ role: "student" }).sort({ createdAt: -1 }).select("-password").lean(),
       Payment.find({ status: "approved" }).lean(),
       Course.find({}).lean()
     ]);
 
     const usersWithDetails = users.map((user: any) => {
-      
+
       // Is user ki approved payments
       const userPayments = payments.filter((p: any) => p.email === user.email);
 
       const enrollmentDetails = userPayments.map((p: any) => {
         // Course data dhundo
         const courseData: any = courses.find((c: any) => c.slug === p.courseSlug);
-        
+
         // --- PRIORITY LOGIC ---
-        
+
         // 1. Admin ki Custom Fee (DB se uthao)
         const adminPrice = p.customTotalFee ? Number(p.customTotalFee) : 0;
-        
+
         // 2. Original Course Price
         const coursePrice = courseData?.price ? Number(courseData.price) : 0;
-        
+
         // 3. Final Decision
         let finalFee = 5000; // Default fallback
 
         if (adminPrice > 0) {
-            finalFee = adminPrice; // Priority 1: Admin Override
+          finalFee = adminPrice; // Priority 1: Admin Override
         } else if (coursePrice > 0) {
-            finalFee = coursePrice; // Priority 2: Course Default
-        } 
+          finalFee = coursePrice; // Priority 2: Course Default
+        }
         // Else: 5000 hi rahega
 
         return {

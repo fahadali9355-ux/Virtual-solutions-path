@@ -140,6 +140,7 @@ export default function SignupPage() {
         localStorage.setItem("userEmail", data.user.email);
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("userRole", data.user.role || "student");
+        localStorage.setItem("hasPhone", data.user.hasPhone ? "true" : "false"); // 👈 Save hasPhone
 
         alert("Account Created & Verified with Google! 🎉");
         router.push("/dashboard");

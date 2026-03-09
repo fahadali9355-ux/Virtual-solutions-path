@@ -39,6 +39,10 @@ export default function LoginPage() {
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("userRole", data.user.role || "student");
 
+        // 👈 NEW: Check if phone exists
+        const hasPhoneVal = data.user.role === "admin" ? "true" : (data.user.hasPhone ? "true" : "false");
+        localStorage.setItem("hasPhone", hasPhoneVal);
+
         if (data.user.role === "admin") {
           router.push("/admin");
         } else {
@@ -79,6 +83,7 @@ export default function LoginPage() {
         localStorage.setItem("userEmail", data.user.email);
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("userRole", data.user.role || "student");
+        localStorage.setItem("hasPhone", data.user.hasPhone ? "true" : "false"); // 👈 Save hasPhone
 
         if (data.user.role === "admin") {
           router.push("/admin");

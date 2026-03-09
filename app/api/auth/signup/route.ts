@@ -6,7 +6,7 @@ import { sendEmail } from "@/lib/sendEmail"; // 👈 New Helper Import kia
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, phone } = await req.json();
     await connectDB();
 
     // Check if user exists
@@ -26,6 +26,7 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      phone: phone || "", // Save phone number if provided
       isVerified: false, // Abhi verify nahi hua
       verificationCode,
       verificationCodeExpire: Date.now() + 10 * 60 * 1000, // 10 Minutes expiry
