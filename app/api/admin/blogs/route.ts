@@ -1,6 +1,14 @@
 import { connectDB } from "@/lib/db";
 import Blog from "@/models/Blog";
 import { NextRequest, NextResponse } from "next/server";
+import { v2 as cloudinary } from "cloudinary";
+
+// Cloudinary Config
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Helper: Generate slug from title
 function generateSlug(title: string) {
@@ -18,19 +26,45 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     await connectDB();
     try {
-        const body = await req.json();
-        const { title, author, category, coverImage, excerpt, content, tags, published } = body;
+        const formData = await req.formData();
+        const title = formData.get("title") as string;
+        const author = formData.get("author") as string;
+        const category = formData.get("category") as string;
+        const excerpt = formData.get("excerpt") as string;
+        const content = formData.get("content") as string;
+        const tagsString = formData.get("tags") as string;
+        const publishedString = formData.get("published") as string;
+        const published = publishedString === "true";
+
+        let coverImage = formData.get("coverImage") as string || "";
+        const imageFile = formData.get("image") as File;
 
         if (!title || !category || !excerpt || !content) {
             return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
+        }
+
+        if (imageFile) {
+            const arrayBuffer = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            const uploadResponse: any = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    { folder: "vsp_blogs" },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                ).end(buffer);
+            });
+            coverImage = uploadResponse.secure_url;
         }
 
         const slug = generateSlug(title) + "-" + Date.now();
 
         const blog = new Blog({
             title, slug, author, category, coverImage, excerpt, content,
-            tags: tags ? tags.split(",").map((t: string) => t.trim()) : [],
-            published: published === true,
+            tags: tagsString ? tagsString.split(",").map((t: string) => t.trim()) : [],
+            published,
         });
 
         await blog.save();
@@ -44,16 +78,56 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
     await connectDB();
     try {
-        const body = await req.json();
-        const { id, title, author, category, coverImage, excerpt, content, tags, published, featuredOnHome } = body;
+        const formData = await req.formData();
+        const id = formData.get("id") as string;
+        const title = formData.get("title") as string;
+        const author = formData.get("author") as string;
+        const category = formData.get("category") as string;
+        const excerpt = formData.get("excerpt") as string;
+        const content = formData.get("content") as string;
+        const tagsString = formData.get("tags") as string;
+        const publishedString = formData.get("published") as string;
+        const published = publishedString === "true";
+        const featuredOnHomeString = formData.get("featuredOnHome") as string;
+        const featuredOnHome = featuredOnHomeString === "true";
 
-        const updated = await Blog.findByIdAndUpdate(id, {
-            title, author, category, coverImage, excerpt, content,
-            tags: tags ? (Array.isArray(tags) ? tags : tags.split(",").map((t: string) => t.trim())) : [],
+        let coverImage = formData.get("coverImage") as string;
+        const imageFile = formData.get("image") as File;
+
+        if (imageFile && imageFile.size > 0) {
+            const arrayBuffer = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            const uploadResponse: any = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    { folder: "vsp_blogs" },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                ).end(buffer);
+            });
+            coverImage = uploadResponse.secure_url;
+        }
+
+        let parsedTags: string[] = [];
+        if (tagsString) {
+           parsedTags = tagsString.split(",").map((t: string) => t.trim());
+        }
+
+        const updateData: any = {
+            title, author, category, excerpt, content,
+            tags: parsedTags,
             published,
-            ...(featuredOnHome !== undefined && { featuredOnHome }),
+            ...(featuredOnHomeString && { featuredOnHome }),
             updatedAt: new Date(),
-        }, { new: true });
+        };
+
+        if (coverImage) {
+            updateData.coverImage = coverImage;
+        }
+
+        const updated = await Blog.findByIdAndUpdate(id, updateData, { new: true });
 
         return NextResponse.json({ success: true, blog: updated });
     } catch (error: any) {

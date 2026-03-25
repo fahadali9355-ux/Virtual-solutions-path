@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Eye, EyeOff, UploadCloud, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function AddBlogPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [published, setPublished] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -24,21 +27,46 @@ export default function AddBlogPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+            setPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const removeImage = () => {
+        setImageFile(null);
+        setPreview(null);
+    };
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         setLoading(true);
         try {
+            const data = new FormData();
+            data.append("title", formData.title);
+            data.append("author", formData.author);
+            data.append("category", formData.category);
+            data.append("excerpt", formData.excerpt);
+            data.append("content", formData.content);
+            data.append("tags", formData.tags);
+            data.append("published", String(published));
+            
+            if (imageFile) {
+                data.append("image", imageFile);
+            }
+
             const res = await fetch("/api/admin/blogs", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...formData, published }),
+                body: data,
             });
-            const data = await res.json();
+            const responseData = await res.json();
             if (res.ok) {
                 alert("Blog Published! 🎉");
                 router.push("/admin/blogs");
             } else {
-                alert(data.error || "Failed to save blog.");
+                alert(responseData.error || "Failed to save blog.");
             }
         } catch {
             alert("Server error.");
@@ -80,11 +108,27 @@ export default function AddBlogPage() {
                     </div>
                 </div>
 
-                {/* Cover Image URL */}
+                {/* Cover Image Upload */}
                 <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Cover Image URL</label>
-                    <input name="coverImage" onChange={handleChange} className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none" placeholder="https://..." />
-                    <p className="text-xs text-slate-500">Paste an image URL (from Google Drive, Imgur, etc.)</p>
+                    <label className="text-sm font-bold text-slate-700">Cover Image</label>
+                    
+                    {!preview ? (
+                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                            <div className="flex flex-col items-center gap-2 text-slate-400">
+                                <UploadCloud size={24} />
+                                <span className="text-sm">Upload Image</span>
+                            </div>
+                            <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                        </label>
+                    ) : (
+                        <div className="relative w-full h-48 rounded-xl overflow-hidden border border-slate-200 group">
+                            <Image src={preview} alt="Preview" fill className="object-cover" />
+                            <button type="button" onClick={removeImage} 
+                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-80 hover:opacity-100 transition-opacity">
+                                <X size={16} />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Excerpt */}
