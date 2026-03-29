@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, CheckCircle, ArrowRight, Star, Users, Briefcase, PlayCircle, Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, LayoutDashboard, Loader2, Menu, X, Calendar, Tag } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from "@/components/Navbar";
 
 // --- ANIMATION CONFIG ---
 const fadeInUp: any = {
@@ -101,61 +102,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans overflow-x-hidden selection:bg-blue-100">
 
       {/* --- NAVBAR --- */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="fixed w-full z-50 bg-white/90 border-b border-slate-100 backdrop-blur-xl"
-      >
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-
-          {/* Logo */}
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-[#082F49]">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg"><img src="/images/img1.png" alt="Course Image" className="w-full h-auto rounded-lg" /></div>
-            <span>Virtual Solution Path</span>
-          </div>
-
-          {/* Desktop Links */}
-          <div className="hidden md:flex gap-8 text-sm font-semibold text-slate-600">
-            <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
-            <button onClick={scrollToCourses} className="hover:text-blue-600 transition-colors">Courses</button>
-            <a href="/about" className="hover:text-blue-600 transition-colors">About</a>
-            <a href="/blogs" className="hover:text-blue-600 transition-colors">Blog</a>
-            <a href="/contact" className="hover:text-blue-600 transition-colors">Contact</a>
-          </div>
-
-          {/* Auth Buttons (Dynamic Logic) */}
-          <div className="flex gap-3">
-            {isLoggedIn ? (
-              <Link href="/dashboard/courses" className="hidden md:block">
-                <button className="bg-[#082F49] text-white px-6 py-2.5 rounded-full font-bold shadow-lg hover:bg-[#0C4A6E] transition-all text-sm flex items-center gap-2">
-                  <LayoutDashboard size={18} />
-                  Dashboard
-                </button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login" className="hidden md:flex px-6 py-2.5 text-[#082F49] font-bold hover:bg-slate-50 rounded-full transition-all text-sm items-center">
-                  Log In
-                </Link>
-                <Link href="/signup" className="hidden md:block">
-                  <button className="bg-[#0284C7] text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-blue-500/30 hover:bg-[#0369A1] hover:-translate-y-0.5 transition-all text-sm">
-                    Sign up
-                  </button>
-                </Link>
-              </>
-            )}
-
-            {/* Mobile Menu Toggle Button */}
-            <button
-              className="md:hidden p-2 text-slate-600 hover:text-blue-600 focus:outline-none"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
-        </div>
-      </motion.nav>
+      <Navbar />
 
       {/* Mobile Menu Dropdown */}
       <AnimatePresence>

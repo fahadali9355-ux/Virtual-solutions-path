@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Award, Clock, TrendingUp, Loader2, CreditCard, DollarSign } from "lucide-react";
+import { Users, Award, Loader2, CreditCard, DollarSign, GraduationCap, Briefcase } from "lucide-react";
 import Link from "next/link"; 
 
 export default function AdminDashboard() {
@@ -123,6 +123,33 @@ export default function AdminDashboard() {
                <h3 className="text-2xl font-bold text-slate-800">Rs {stats.totalRevenue.toLocaleString()}</h3>
             </div>
          </div>
+         {/* 5. Card: Alumni */}
+         <Link href="/admin/alumni">
+             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer group">
+                <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                   <GraduationCap size={24} />
+                </div>
+                <div>
+                   <p className="text-slate-500 text-xs font-bold uppercase tracking-wide">Alumni</p>
+                   <h3 className="text-2xl font-bold text-slate-800">Directory</h3>
+                   <span className="text-xs text-teal-600 font-bold">Manage Records</span>
+                </div>
+             </div>
+         </Link>
+
+         {/* 6. Card: Jobs */}
+         <Link href="/admin/jobs">
+             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer group">
+                <div className="w-12 h-12 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center group-hover:bg-violet-600 group-hover:text-white transition-colors">
+                   <Briefcase size={24} />
+                </div>
+                <div>
+                   <p className="text-slate-500 text-xs font-bold uppercase tracking-wide">Jobs</p>
+                   <h3 className="text-2xl font-bold text-slate-800">Opportunities</h3>
+                   <span className="text-xs text-violet-600 font-bold">Manage Postings</span>
+                </div>
+             </div>
+         </Link>
       </div>
 
       {/* --- QUICK ACTIONS SECTION --- */}
@@ -154,6 +181,34 @@ export default function AdminDashboard() {
                 </Link>
              </div>
              <Award className="absolute -right-6 -bottom-6 text-white/10 w-48 h-48 -rotate-12" />
+          </div>
+
+          {/* Action 3: Manage Alumni */}
+          <div className="bg-teal-600 rounded-3xl p-8 text-white relative overflow-hidden flex flex-col justify-between">
+             <div className="relative z-10">
+                <h2 className="text-2xl font-bold mb-2">Alumni Directory</h2>
+                <p className="text-teal-100 mb-6">
+                   Add, update, and manage certified graduates shown on the public <strong>Career Hub</strong> page.
+                </p>
+                <Link href="/admin/alumni" className="bg-white text-teal-700 px-6 py-3 rounded-xl font-bold hover:bg-teal-50 transition-colors inline-flex items-center gap-2">
+                   Manage Alumni <GraduationCap size={18} />
+                </Link>
+             </div>
+             <GraduationCap className="absolute -right-6 -bottom-6 text-white/10 w-48 h-48 rotate-6" />
+          </div>
+
+          {/* Action 4: Manage Jobs */}
+          <div className="bg-violet-700 rounded-3xl p-8 text-white relative overflow-hidden flex flex-col justify-between">
+             <div className="relative z-10">
+                <h2 className="text-2xl font-bold mb-2">Job Opportunities</h2>
+                <p className="text-violet-100 mb-6">
+                   Post and manage career opportunities for VSP students and alumni through partner companies.
+                </p>
+                <Link href="/admin/jobs" className="bg-white text-violet-700 px-6 py-3 rounded-xl font-bold hover:bg-violet-50 transition-colors inline-flex items-center gap-2">
+                   Manage Jobs <Briefcase size={18} />
+                </Link>
+             </div>
+             <Briefcase className="absolute -right-6 -bottom-6 text-white/10 w-48 h-48 -rotate-6" />
           </div>
 
       </div>

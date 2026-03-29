@@ -84,13 +84,8 @@ export default function PaymentForm({ course }: { course: any }) {
 
             {/* Bank Details */}
             <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mb-6 text-sm">
-               <p className="font-bold text-slate-800">EasyPaisa:</p>
-               <p className="text-slate-600 font-mono text-lg tracking-wider mt-1">0318-2009250</p>
                <p className="font-bold text-slate-800">FAISAL BANK:</p>
                <p className="text-slate-600 font-mono text-lg tracking-wider mt-1"> PK70FAYS3637301000002966</p>
-               <p className="text-slate-500 text-xs mt-1">Title: MIRZA ALI TAHIR</p>
-               <p className="font-bold text-slate-800">NAYA PAY:</p>
-               <p className="text-slate-600 font-mono text-lg tracking-wider mt-1">PK80NAYA1234503182009250</p>
                <p className="text-slate-500 text-xs mt-1">Title: MIRZA ALI TAHIR</p>
                <p className="text-green-700 font-bold text-xs mt-2">✨ You can pay in installments.</p>
             </div>
@@ -99,8 +94,6 @@ export default function PaymentForm({ course }: { course: any }) {
                <div>
                   <label className="text-sm font-bold text-slate-700">Payment Method</label>
                   <select value={method} onChange={(e) => setMethod(e.target.value)} className="w-full p-3 border rounded-xl mt-1 bg-white">
-                     <option>NAYA PAY</option>
-                     <option>EasyPaisa</option>
                      <option>FAISAL BANK</option>
                   </select>
                </div>
