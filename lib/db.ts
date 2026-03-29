@@ -1,9 +1,13 @@
 import mongoose from "mongoose";
 
-// Aapka Direct Link
-const MONGODB_URI = "mongodb://virtualsolutionspath_db_user:Virtual123@ac-ob5wmox-shard-00-00.poee7aw.mongodb.net:27017,ac-ob5wmox-shard-00-01.poee7aw.mongodb.net:27017,ac-ob5wmox-shard-00-02.poee7aw.mongodb.net:27017/vsp_database?ssl=true&replicaSet=atlas-nf2ghg-shard-0&authSource=admin";
+// 🛑 SECURITY UPDATE: Link ko direct likhne ke bajaye .env file se get kar rahe hain
+const MONGODB_URI = process.env.MONGODB_URI as string;
 
-// 👇 Ye caching logic zaroori hai Next.js k liye, warna "Too Many Connections" ka error ayega
+if (!MONGODB_URI) {
+  throw new Error("Bhai, .env file mein MONGODB_URI missing hai! Fauran add karo.");
+}
+
+// 👇 Ye caching logic zaroori hai Next.js/Vercel k liye, warna "Too Many Connections" ka error ayega
 let cached = (global as any).mongoose;
 
 if (!cached) {
@@ -19,8 +23,11 @@ export const connectDB = async () => {
 
   if (!cached.promise) {
     console.log("⚡ Connecting to MongoDB...");
+    
+    // 👇 UPDATE: maxPoolSize add kiya hai taake Vercel achanak se limit cross na kare
     const opts = {
       bufferCommands: false,
+      maxPoolSize: 10, // Traffic Police: Ek waqt mein sirf 10 active connections banenge
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
@@ -32,7 +39,7 @@ export const connectDB = async () => {
   try {
     cached.conn = await cached.promise;
   } catch (e) {
-    cached.promise = null;
+    cached.promise = null; // Agar error aaye toh promise reset kardo
     console.log("❌ Connection Failed:", e);
     throw e;
   }
